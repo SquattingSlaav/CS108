@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Eater {
+    char first[15];
+    char last[15];
+    int fastest;
+    double greatest;
+    int comps;
+    char grade[15];
+};
+
+void read(struct Eater[], int, char *);
+void display(struct Eater[], int);
+void grade(struct Eater[], int);
+void result(struct Eater[], int, char *);
+
+int main(void) {
+    struct Eater eaters[16];
+
+    read(eaters, 16, "legends.dat");
+
+    display(eaters, 16);
+
+    grade(eaters, 16);
+
+    display(eaters, 16);
+
+    result(eaters, 16, "legends_rated.dat");
+
+    return 0;
+}
+
+void read(struct Eater eaters[], int size, char *filename) {
+    FILE *file = fopen(filename, "r");
+
+    for (int i = 0; i < size; i++) {
+        fscanf(file, "%s %s %d %lf %d %s",
+                eaters[i].first,
+                eaters[i].last,
+                &eaters[i].fastest,
+                &eaters[i].greatest,
+                &eaters[i].comps,
+                eaters[i].grade);
+    }
+
+    fclose(file);
+}
+
+void display(struct Eater eaters[], int size) {
+    for(int i = 0; i < size; i++) {
+        printf("%s %s\n", eaters[i].first, eaters[i].last);
+        printf("Fastest Time: %d \n", eaters[i].fastest);
+        printf("Greatest Weight: %.2lf\n", eaters[i].greatest);
+        printf("Competitions in last year: %d\n", eaters[i].comps);
+        printf("Grade: %s\n", eaters[i].grade);
+        printf("\n");
+    }
+}
+
+void grade(struct Eater eaters[], int size) {
+    for(int i = 0; i < size; i++) {
+        if (eaters[i].fastest > 20 &&
+                eaters[i].greatest > 7 &&
+                eaters[i].comps >= 25) {
+            strcpy(eaters[i].grade, "5");
+        } else if (eaters[i].fastest > 20 &&
+                eaters[i].greatest > 7) {
+            strcpy(eaters[i].grade, "4");
+        } else if (eaters[i].greatest > 7 &&
+                eaters[i].comps >=25) {
+            strcpy(eaters[i].grade, "3");
+        } else if (eaters[i].fastest > 20 &&
+                eaters[i].comps >= 25) {
+            strcpy(eaters[i].grade, "2");
+        } else if ((eaters[i].fastest > 20 ) ||
+                (eaters[i].greatest > 7) ||
+                (eaters[i].comps >= 25)) {
+            strcpy(eaters[i].grade, "1");
+        } else {
+            strcpy(eaters[i].grade, "0");
+        }
+    }
+}
+
+void result(struct Eater eaters[], int size, char *filename) {
+    FILE *file = fopen(filename, "w");
+
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    for (int i = 0; i < size; i++) {
+        fprintf(file, "%s %s %d %.2lf %d %s\n",
+                eaters[i].first,
+                eaters[i].last,
+                eaters[i].fastest,
+                eaters[i].greatest,
+                eaters[i].comps,
+                eaters[i].grade);
+    }
+
+    fclose(file);
+}
